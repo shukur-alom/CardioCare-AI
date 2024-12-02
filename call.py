@@ -1,6 +1,6 @@
 import requests
 
-url = 'https://flask-production-d02b.up.railway.app/predict'
+url = 'https://shukur533.up.railway.app/predict'
 
 data = {"age": 49,
         "sex" : 0,
