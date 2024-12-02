@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import joblib
+import os
 import random
 
 advice = ['''Take immediate action to consult a healthcare professional for a thorough evaluation and confirmation of the diagnosis. Early intervention is critical; follow the doctor's advice, which may include lifestyle changes such as adopting a low-sodium diet, increasing physical activity under guidance, and managing stress levels. Ensure medications, if prescribed, are taken as directed and attend regular check-ups to monitor your heart health. Avoid self-diagnosis or panic, and rely on the expertise of medical professionals to guide your care. Staying informed and proactive can significantly improve outcomes and quality of life.''',
