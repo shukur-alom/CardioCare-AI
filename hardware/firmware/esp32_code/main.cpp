@@ -16,6 +16,12 @@ unsigned long lastTempRead = 0;          // To keep track of the last temperatur
 const unsigned long tempInterval = 5000; // Read temperature every 5 seconds
 float temperature;
 
+// SpO2 variables
+float redValue, irValue;
+float SpO2 = 0;
+unsigned long lastSpO2Read = 0;          // To keep track of the last SpO2 reading time
+const unsigned long spo2Interval = 5000; // Read SpO2 every 5 seconds (adjust as needed)
+
 void setup()
 {
     Serial.begin(115200);
@@ -38,13 +44,15 @@ void setup()
 
 void loop()
 {
-    long irValue = particleSensor.getIR();
+    redValue = particleSensor.getRed(); // Get Red value for SpO2 calculation
+    irValue = particleSensor.getIR();   // Get IR value for SpO2 calculation
 
     if (irValue < 50000)
     {
         beatsPerMinute = 0;
         beatAvg = 0;
         temperature = 0;
+        SpO2 = 0;
 
         Serial.print(" No finger?");
     }
@@ -80,14 +88,28 @@ void loop()
         if (millis() - lastTempRead >= tempInterval)
         {
             temperature = particleSensor.readTemperature();
-            lastTempRead = millis();
         }
+        lastTempRead = millis();
 
         Serial.print(", Temp=");
         Serial.print(temperature, 2);
         Serial.print("°C");
+
+        // Control the SpO2 reading interval
+        if (millis() - lastSpO2Read >= spo2Interval)
+        {
+            // Manually Calculate SpO2 using ratio of Red and IR light
+            if (irValue > 0 && redValue > 0)
+            {
+                SpO2 = 100 - ((redValue / irValue) * 100);
+            }
+            lastSpO2Read = millis(); // Update the time of the last SpO2 reading
+        }
+        Serial.print(", SpO2=");
+        Serial.print(SpO2);
+        Serial.print("%");
     }
 
     Serial.println();
-    delay(10); // Slight delay to stabilize readings
+    delay(9); // Slight delay to stabilize readings
 }
