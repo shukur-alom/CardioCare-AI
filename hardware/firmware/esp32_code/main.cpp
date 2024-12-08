@@ -4,24 +4,26 @@
 
 MAX30105 particleSensor;
 
-const byte RATE_SIZE = 6; // Increase this for more averaging. 4 is good.
-byte rates[RATE_SIZE];    // Array of heart rates
+const byte RATE_SIZE = 6;
+byte rates[RATE_SIZE];
 byte rateSpot = 0;
-long lastBeat = 0; // Time at which the last beat occurred
+long lastBeat = 0;
 
 float beatsPerMinute;
 int beatAvg;
+
+unsigned long lastTempRead = 0;          // To keep track of the last temperature reading time
+const unsigned long tempInterval = 5000; // Read temperature every 5 seconds
+float temperature;
 
 void setup()
 {
     Serial.begin(115200);
     Serial.println("Initializing...");
 
-    // Initialize I2C for ESP32 (adjust pins as needed)
-    Wire.begin(21, 22); // Default I2C pins for ESP32 (SDA = GPIO21, SCL = GPIO22)
+    Wire.begin(21, 22);
 
-    // Initialize sensor
-    if (!particleSensor.begin(Wire, I2C_SPEED_FAST)) // Use default I2C port, 400kHz speed
+    if (!particleSensor.begin(Wire, I2C_SPEED_FAST))
     {
         Serial.println("MAX30105 was not found. Please check wiring/power.");
         while (1)
@@ -29,9 +31,9 @@ void setup()
     }
     Serial.println("Place your index finger on the sensor with steady pressure.");
 
-    particleSensor.setup();                    // Configure sensor with default settings
-    particleSensor.setPulseAmplitudeRed(0x0A); // Turn Red LED to low to indicate sensor is running
-    particleSensor.setPulseAmplitudeGreen(0);  // Turn off Green LED
+    particleSensor.setup();
+    particleSensor.setPulseAmplitudeRed(0x0A);
+    particleSensor.setPulseAmplitudeGreen(0);
 }
 
 void loop()
@@ -42,13 +44,14 @@ void loop()
     {
         beatsPerMinute = 0;
         beatAvg = 0;
+        temperature = 0;
+
         Serial.print(" No finger?");
     }
     else
     {
         if (checkForBeat(irValue) == true)
         {
-            // We sensed a beat!
             long delta = millis() - lastBeat;
             lastBeat = millis();
 
@@ -56,10 +59,9 @@ void loop()
 
             if (beatsPerMinute < 255 && beatsPerMinute > 20)
             {
-                rates[rateSpot++] = (byte)beatsPerMinute; // Store this reading in the array
-                rateSpot %= RATE_SIZE;                    // Wrap variable
+                rates[rateSpot++] = (byte)beatsPerMinute;
+                rateSpot %= RATE_SIZE;
 
-                // Take average of readings
                 beatAvg = 0;
                 for (byte x = 0; x < RATE_SIZE; x++)
                     beatAvg += rates[x];
@@ -73,7 +75,19 @@ void loop()
         Serial.print(beatsPerMinute);
         Serial.print(", Avg BPM=");
         Serial.print(beatAvg);
+
+        // Read temperature at intervals
+        if (millis() - lastTempRead >= tempInterval)
+        {
+            temperature = particleSensor.readTemperature();
+            lastTempRead = millis();
+        }
+
+        Serial.print(", Temp=");
+        Serial.print(temperature, 2);
+        Serial.print("°C");
     }
 
     Serial.println();
+    delay(10); // Slight delay to stabilize readings
 }
