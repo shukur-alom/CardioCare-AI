@@ -12,15 +12,15 @@ long lastBeat = 0;
 float beatsPerMinute;
 int beatAvg;
 
-unsigned long lastTempRead = 0;          // To keep track of the last temperature reading time
-const unsigned long tempInterval = 5000; // Read temperature every 5 seconds
-float temperature;
+unsigned long lastTempRead = 0;          // To keep track of the last temperature_live reading time
+const unsigned long tempInterval = 6000; // Read temperature_live every 5 seconds
+float temperature_live;
 
 // SpO2 variables
 float redValue, irValue;
-float SpO2 = 0;
+float SpO2 = 0.0;
 unsigned long lastSpO2Read = 0;          // To keep track of the last SpO2 reading time
-const unsigned long spo2Interval = 5000; // Read SpO2 every 5 seconds (adjust as needed)
+const unsigned long spo2Interval = 6000; // Read SpO2 every 5 seconds (adjust as needed)
 
 void setup()
 {
@@ -49,10 +49,12 @@ void loop()
 
     if (irValue < 50000)
     {
-        beatsPerMinute = 0;
+        lastTempRead = 0;
+        lastSpO2Read = 0;
+        beatsPerMinute = 0.0;
         beatAvg = 0;
-        temperature = 0;
-        SpO2 = 0;
+        temperature_live = 0.0;
+        SpO2 = 0.0;
 
         Serial.print(" No finger?");
     }
@@ -84,17 +86,6 @@ void loop()
         Serial.print(", Avg BPM=");
         Serial.print(beatAvg);
 
-        // Read temperature at intervals
-        if (millis() - lastTempRead >= tempInterval)
-        {
-            temperature = particleSensor.readTemperature();
-        }
-        lastTempRead = millis();
-
-        Serial.print(", Temp=");
-        Serial.print(temperature, 2);
-        Serial.print("°C");
-
         // Control the SpO2 reading interval
         if (millis() - lastSpO2Read >= spo2Interval)
         {
@@ -108,6 +99,17 @@ void loop()
         Serial.print(", SpO2=");
         Serial.print(SpO2);
         Serial.print("%");
+
+        // Read temperature_live at intervals
+        if (millis() - lastTempRead >= tempInterval)
+        {
+            temperature_live = particleSensor.readTemperature();
+            lastTempRead = millis();
+        }
+
+        Serial.print(", Temp=");
+        Serial.print(temperature_live, 2);
+        Serial.print("°C");
     }
 
     Serial.println();
