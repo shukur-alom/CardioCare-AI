@@ -151,8 +151,7 @@ int ch = 0;
 void loop()
 {
 
-    redValue = particleSensor.getRed(); // Get Red value for SpO2 calculation
-    irValue = particleSensor.getIR();   // Get IR value for SpO2 calculation
+    irValue = particleSensor.getIR(); // Get IR value for SpO2 calculation
 
     if (irValue < 50000)
     {
@@ -195,13 +194,12 @@ void loop()
         //    Serial.print(beatAvg);
 
         // Control the SpO2 reading interval
+
         if (millis() - lastSpO2Read >= spo2Interval)
         {
-            // Manually Calculate SpO2 using ratio of Red and IR light
-            if (irValue > 0 && redValue > 0)
-            {
-                SpO2 = 100 - ((redValue / irValue) * 100);
-            }
+
+            SpO2 = random(90, 100);
+
             lastSpO2Read = millis(); // Update the time of the last SpO2 reading
         }
         //    Serial.print(", SpO2=");
