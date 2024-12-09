@@ -134,7 +134,6 @@ void loop()
     }
 
     Serial.println();
-    // Clear the buffer.
     display.clearDisplay();
 
     // Display Text
@@ -143,6 +142,7 @@ void loop()
     display.setCursor(0, 28);
     display.println(beatAvg);
     display.display();
-    delay(10);
+
     display.clearDisplay();
+    delay(10);
 }
