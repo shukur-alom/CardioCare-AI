@@ -35,7 +35,7 @@ unsigned long lastSpO2Read = 0;          // To keep track of the last SpO2 readi
 const unsigned long spo2Interval = 6000; // Read SpO2 every 5 seconds (adjust as needed)
 
 int frame = 0;
-#define FRAME_DELAY (20)
+#define FRAME_DELAY (10)
 #define FRAME_WIDTH (32)
 #define FRAME_HEIGHT (32)
 #define FRAME_COUNT (sizeof(frames) / sizeof(frames[0]))
@@ -147,6 +147,7 @@ void setup()
     particleSensor.setPulseAmplitudeGreen(0);
 }
 
+int ch = 0;
 void loop()
 {
 
@@ -161,6 +162,7 @@ void loop()
         beatAvg = 0;
         temperature_live = 0.0;
         SpO2 = 0.0;
+        ch = 0;
         hand_display();
         Serial.print(" No finger?");
     }
@@ -217,14 +219,16 @@ void loop()
         Serial.print(temperature_live, 2);
         Serial.print("°C");
 
-        //    display.clearDisplay();
-        //    display.setTextSize(1);
-        //    display.setTextColor(WHITE);
-        //    display.setCursor(0, 28);
-        //    display.println(beatAvg);
-        //    display.display();
-
-        heart();
+        display.clearDisplay();
+        display.setTextSize(1);
+        display.setTextColor(WHITE);
+        display.setCursor(0, 10);
+        display.println(beatAvg);
+        display.setCursor(0, 20);
+        display.println(SpO2)
+            display.setCursor(0, 30);
+        display.println(temperature_live, 2)
+            display.display();
     }
 
     Serial.println();
