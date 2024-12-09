@@ -204,15 +204,19 @@ void loop()
         display.setTextSize(1);
         display.setTextColor(WHITE);
         display.setCursor(0, 10);
+        display.print("BP Live : ");
         display.println(beatsPerMinute);
 
         display.setCursor(0, 25);
+        display.print("BP : ");
         display.println(beatAvg);
 
         display.setCursor(0, 40);
+        display.print("SpO2 : ");
         display.println(SpO2, 2);
 
         display.setCursor(0, 55);
+        display.print("Temp : ");
         display.println(temperature_live, 2);
         display.display();
     }
