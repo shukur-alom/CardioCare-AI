@@ -213,11 +213,13 @@ void loop()
 
         display.setCursor(0, 40);
         display.print("SpO2 : ");
-        display.println(SpO2, 2);
+        display.print(SpO2, 2);
+        display.println(" %");
 
         display.setCursor(0, 55);
         display.print("Temp : ");
-        display.println(temperature_live, 2);
+        display.print(temperature_live, 2);
+        display.println(" °C");
         display.display();
     }
 
