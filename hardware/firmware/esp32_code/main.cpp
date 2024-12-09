@@ -163,7 +163,6 @@ void loop()
         SpO2 = 0.0;
         ch = 0;
         hand_display();
-        // Serial.print(" No finger?");
     }
     else
     {
@@ -186,25 +185,13 @@ void loop()
             }
         }
 
-        //    Serial.print("IR=");
-        //    Serial.print(irValue);
-        //    Serial.print(", BPM=");
-        //    Serial.print(beatsPerMinute);
-        //    Serial.print(", Avg BPM=");
-        //    Serial.print(beatAvg);
-
         // Control the SpO2 reading interval
-
         if (millis() - lastSpO2Read >= spo2Interval)
         {
 
             SpO2 = random(90, 100);
-
             lastSpO2Read = millis(); // Update the time of the last SpO2 reading
         }
-        //    Serial.print(", SpO2=");
-        //    Serial.print(SpO2);
-        //    Serial.print("%");
 
         // Read temperature_live at intervals
         if (millis() - lastTempRead >= tempInterval)
@@ -212,10 +199,6 @@ void loop()
             temperature_live = particleSensor.readTemperature();
             lastTempRead = millis();
         }
-        //
-        //    Serial.print(", Temp=");
-        //    Serial.print(temperature_live, 2);
-        //    Serial.print("°C");
 
         display.clearDisplay();
         display.setTextSize(1);
@@ -233,8 +216,6 @@ void loop()
         display.println(temperature_live, 2);
         display.display();
     }
-
-    Serial.println();
 
     delay(10);
 }
