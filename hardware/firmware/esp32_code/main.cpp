@@ -1,9 +1,11 @@
 #include <SPI.h>
 #include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#include <WiFi.h>
 #include "MAX30105.h"
 #include "heartRate.h"
+#include <PubSubClient.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
@@ -15,7 +17,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 MAX30105 particleSensor;
 
-const byte RATE_SIZE = 6;
+const byte RATE_SIZE = 4;
 byte rates[RATE_SIZE];
 byte rateSpot = 0;
 long lastBeat = 0;
@@ -40,6 +42,62 @@ int frame = 0;
 #define FRAME_WIDTH (32)
 #define FRAME_HEIGHT (32)
 #define FRAME_COUNT (sizeof(frames) / sizeof(frames[0]))
+
+/////////////////////////////////////////////////////////////////////////////
+
+unsigned long previousMillis = 0;
+unsigned long interval = 30000; // 30 seconds for WiFi reconnection
+
+WiFiClient wifiClient;
+PubSubClient mqttClient(wifiClient);
+
+const char *ssid = "IoT";
+const char *password = "61179318";
+const char *mqttServer = "broker.emqx.io";
+int mqttPort = 1883;
+
+void setupMQTT()
+{
+    mqttClient.setServer(mqttServer, mqttPort);
+    mqttClient.setCallback(callback);
+}
+
+void reconnectMQTT()
+{
+    while (!mqttClient.connected())
+    {
+        Serial.print("Attempting MQTT connection...");
+        String clientId = "ESP32Client-";
+        clientId += String(random(0xffff), HEX);
+        if (mqttClient.connect(clientId.c_str()))
+        {
+            Serial.println("Connected to MQTT broker.");
+            mqttClient.subscribe("gps/61179");
+        }
+        else
+        {
+            Serial.print("failed, rc=");
+            Serial.print(mqttClient.state());
+            Serial.println(" try again in 5 seconds");
+            delay(5000);
+        }
+    }
+}
+
+void initWiFi()
+{
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(ssid, password);
+    Serial.print("Connecting to WiFi ..");
+    while (WiFi.status() != WL_CONNECTED)
+    {
+        Serial.print('.');
+        delay(1000);
+    }
+    Serial.println("Connected to WiFi, IP address: ");
+    Serial.println(WiFi.localIP());
+}
+////////////////////////////////////////////////////////////////////
 
 void hand_display()
 {
@@ -125,6 +183,8 @@ void setup()
 {
     Serial.begin(115200);
     Serial.println("Initializing...");
+    initWiFi();
+    setupMQTT();
 
     Wire.begin(21, 22);
 
@@ -151,9 +211,31 @@ void setup()
 
 int is_print = 0;
 int is_heart = 0;
+int percentage = 0;
+int pev_percentage = 0;
 
 void loop()
 {
+    if (WiFi.status() != WL_CONNECTED)
+    {
+        unsigned long currentMillis = millis();
+        if (currentMillis - previousMillis >= interval)
+        {
+            previousMillis = currentMillis;
+            WiFi.disconnect();
+            initWiFi();
+        }
+    }
+
+    if (!mqttClient.connected())
+    {
+        reconnectMQTT();
+    }
+
+    mqttClient.loop();
+
+    ///////////////////////////////////////////////////
+
     float irValue = particleSensor.getIR();
 
     if (checkForBeat(irValue) == true)
@@ -254,11 +336,46 @@ void loop()
             display.println("C");
             display.display();
 
-            delay(8000);
             is_print = 1;
+            percentage = 100;
+        }
+
+        else if (millis() - last_display >= 15000 && is_print == 0)
+        {
+            percentage = 75;
+        }
+
+        else if (millis() - last_display >= 10000 && is_print == 0)
+        {
+            percentage = 50;
+        }
+
+        else if (millis() - last_display >= 5000 && is_print == 0)
+        {
+            percentage = 25;
+        }
+
+        else if (millis() - last_display >= 10 && is_print == 0)
+        {
+            percentage = 0;
+        }
+
+        if (percentage != pev_percentage)
+        {
+
+            String payload = String(beatAvg) + "," + String(SpO2, 2) + "," + String(temperature_live, 2) + "," + String(percentage);
+            for (int i = 0; i <= 1; i++)
+            {
+                mqttClient.publish("cardio/53384", payload.c_str());
+            }
+            pev_percentage = percentage;
         }
     }
 
     Serial.println();
     delay(10);
+}
+
+void callback(char *topic, byte *payload, unsigned int length)
+{
 }
