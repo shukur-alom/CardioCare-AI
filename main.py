@@ -24,7 +24,7 @@ def predict():
 
     data = [[int(data['age']), int(data['sex']), int(data['chest pain type']), int(data['resting bp s']), int(data['exercise angina'])]]
 
-    predict = model.predict(data)
+    predict = model.predict(data)[0]
 
     if predict == 1:
         ans = f"Your Heart Is Abnormal\n{advice[random.randint(0,6)]}"
@@ -33,7 +33,7 @@ def predict():
 
         ans = "Your Heart Is Normal\nNo need to worry. Continue to maintain a healthy lifestyle, including a balanced diet, regular exercise, and stress management, to support your heart health. Remember to attend regular check-ups and screenings to monitor your well-being and catch any potential issues early. Stay informed about heart health and make informed choices to protect your heart for the long term."
 
-    return jsonify({'ans': ans})   
+    return jsonify({'ans': ans, 'index': str(predict)})   
 
 if __name__ == '__main__':
     app.run(debug=True, port=os.getenv("PORT", default=5000))
