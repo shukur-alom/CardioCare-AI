@@ -164,7 +164,7 @@ void loop()
         SpO2 = 0.0;
         ch = 0;
         hand_display();
-        Serial.print(" No finger?");
+        // Serial.print(" No finger?");
     }
     else
     {
@@ -187,12 +187,12 @@ void loop()
             }
         }
 
-        Serial.print("IR=");
-        Serial.print(irValue);
-        Serial.print(", BPM=");
-        Serial.print(beatsPerMinute);
-        Serial.print(", Avg BPM=");
-        Serial.print(beatAvg);
+        //    Serial.print("IR=");
+        //    Serial.print(irValue);
+        //    Serial.print(", BPM=");
+        //    Serial.print(beatsPerMinute);
+        //    Serial.print(", Avg BPM=");
+        //    Serial.print(beatAvg);
 
         // Control the SpO2 reading interval
         if (millis() - lastSpO2Read >= spo2Interval)
@@ -204,9 +204,9 @@ void loop()
             }
             lastSpO2Read = millis(); // Update the time of the last SpO2 reading
         }
-        Serial.print(", SpO2=");
-        Serial.print(SpO2);
-        Serial.print("%");
+        //    Serial.print(", SpO2=");
+        //    Serial.print(SpO2);
+        //    Serial.print("%");
 
         // Read temperature_live at intervals
         if (millis() - lastTempRead >= tempInterval)
@@ -214,21 +214,26 @@ void loop()
             temperature_live = particleSensor.readTemperature();
             lastTempRead = millis();
         }
-
-        Serial.print(", Temp=");
-        Serial.print(temperature_live, 2);
-        Serial.print("°C");
+        //
+        //    Serial.print(", Temp=");
+        //    Serial.print(temperature_live, 2);
+        //    Serial.print("°C");
 
         display.clearDisplay();
         display.setTextSize(1);
         display.setTextColor(WHITE);
         display.setCursor(0, 10);
+        display.println(beatsPerMinute);
+
+        display.setCursor(0, 25);
         display.println(beatAvg);
-        display.setCursor(0, 20);
-        display.println(SpO2)
-            display.setCursor(0, 30);
-        display.println(temperature_live, 2)
-            display.display();
+
+        display.setCursor(0, 40);
+        display.println(SpO2, 2);
+
+        display.setCursor(0, 55);
+        display.println(temperature_live, 2);
+        display.display();
     }
 
     Serial.println();
