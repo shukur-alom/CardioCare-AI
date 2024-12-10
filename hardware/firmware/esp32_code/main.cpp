@@ -370,6 +370,11 @@ void loop()
             }
             pev_percentage = percentage;
         }
+
+        if (percentage == 100)
+        {
+            delay(5000);
+        }
     }
 
     Serial.println();
