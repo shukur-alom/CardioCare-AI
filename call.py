@@ -5,7 +5,7 @@ url = 'https://shukur533.up.railway.app/predict'
 data = {"age": 49,
         "sex" : 0,
         "chest pain type" : 3,
-        "resting bp s" : 160,
+        "resting bp s" : 90,
         "exercise angina" : 0,
         }
 
