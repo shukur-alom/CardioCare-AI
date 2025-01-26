@@ -29,12 +29,16 @@ The mobile application allows users to:
 - Connect to the AI module for advanced analysis.
 - Communicate with a doctor for medical advice.
 
+![App Screenshot 1](https://github.com/shukur-alom/CardioCare-AI/blob/main/Media/CardioCareAi%20(1)_page-0008.jpg)
+![App Screenshot 2](https://github.com/shukur-alom/CardioCare-AI/blob/main/Media/CardioCareAi%20(1)_page-0009.jpg)
+
 ### 2. CardioCare-AI/IoT
 
 The IoT device is responsible for:
 - Measuring heart rate and O3 levels.
 - Displaying the data on a built-in screen.
 - Communicating with the mobile app and AI module.
+![IoT Device](https://github.com/shukur-alom/CardioCare-AI/blob/main/Media/CardioCareAi%20(1)_page-0010.jpg)
 
 ### 3. CardioCare-AI/Artificial-Intelligence
 
