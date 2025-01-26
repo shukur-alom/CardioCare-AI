@@ -87,6 +87,6 @@ The AI module provides:
 
 ## Contact
 
-For more information, please contact our team at [support@cardiocare-ai.com](mailto:support@cardiocare-ai.com).
+For more information, please contact our team at [shukuralom1234@gmail.com](shukuralom1234@gmail.com).
 
 Thank you for using CardioCare-AI!
